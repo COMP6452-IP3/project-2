@@ -1,19 +1,22 @@
-import Layout from "../components/layout"
+import Layout from '../components/layout';
+import { Heading, Text } from '@chakra-ui/react';
 
 export default function ApiExamplePage() {
   return (
     <Layout>
-      <h1>API Example</h1>
-      <p>The examples below show responses from the example API endpoints.</p>
-      <p>
-        <em>You must be signed in to see responses.</em>
-      </p>
-      <h2>Session</h2>
-      <p>/api/examples/session</p>
-      <iframe src="/api/examples/session" />
-      <h2>JSON Web Token</h2>
-      <p>/api/examples/jwt</p>
-      <iframe src="/api/examples/jwt" />
+      <Heading>API Example</Heading>
+      <Text>The examples below show responses from various API endpoints.</Text>
+      <Text fontWeight={600}>You must be signed in to see responses.</Text>
+      <Heading size='md' mt={2}>
+        Session
+      </Heading>
+      <Text>/api/examples/session</Text>
+      <iframe src='/api/examples/session' />
+      <Heading size='md' mt={2}>
+        JSON Web Token
+      </Heading>
+      <Text>/api/examples/jwt</Text>
+      <iframe src='/api/examples/jwt' />
     </Layout>
-  )
+  );
 }

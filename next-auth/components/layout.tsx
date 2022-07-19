@@ -1,14 +1,17 @@
 import Header from "./header"
+import { Box, VStack } from "@chakra-ui/react"
 
 interface Props {
   children: React.ReactNode
 }
 
-export default function Layout({ children }: Props) {
+const Layout = ({ children }: Props) => {
   return (
-    <>
+    <VStack maxW={'1000px'} mx={'auto'} >
       <Header />
-      <main>{children}</main>
-    </>
+      <Box>{children}</Box>
+    </VStack>
   )
 }
+
+export default Layout;

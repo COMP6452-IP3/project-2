@@ -1,12 +1,13 @@
+import { Text, Heading } from "@chakra-ui/react"
 import Layout from "../components/layout"
 
 export default function IndexPage() {
   return (
     <Layout>
-      <h1>COMP6452 Project 2</h1>
-      <p>
+      <Heading>COMP6452 Project 2</Heading>
+      <Text>
         Site run on Next.js with TypeScript and NextAuth.
-      </p>
+      </Text>
     </Layout>
   )
 }
