@@ -1,0 +1,17 @@
+{
+    "name": "database",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Used to store NFTs on the Web3 Storage platform",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "minimist": "^1.2.6",
+        "process": "^0.11.10",
+        "web3.storage": "^3.5.7"
+    },
+    "author": "YOUR NAME",
+    "license": "(Apache-2.0 AND MIT)"
+}
