@@ -8,10 +8,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await unstable_getServerSession(req, res, authOptions)
 
   if (session) {
-    return res.send({
-      content:
-        "This is protected content. You can access this content because you are signed in.",
-    })
+    return res.send({content: "You are logged in."})
   }
 
   res.send({

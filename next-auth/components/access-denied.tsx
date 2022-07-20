@@ -1,10 +1,11 @@
 import { signIn } from "next-auth/react"
+import { Text, Heading } from "@chakra-ui/react"
 
 export default function AccessDenied() {
   return (
     <>
-      <h1>Access Denied</h1>
-      <p>
+      <Heading>Access Denied</Heading>
+      <Text>
         <a
           href="/api/auth/signin"
           onClick={(e) => {
@@ -14,7 +15,7 @@ export default function AccessDenied() {
         >
           You must be signed in to view this page.
         </a>
-      </p>
+      </Text>
     </>
   )
 }

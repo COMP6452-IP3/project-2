@@ -7,7 +7,7 @@ interface Props {
 
 const Layout = ({ children }: Props) => {
   return (
-    <VStack maxW={'1000px'} mx={'auto'} >
+    <VStack maxW={'1000px'} mx={'auto'} w={"80%"} >
       <Header />
       <Box>{children}</Box>
     </VStack>

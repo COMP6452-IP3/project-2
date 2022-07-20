@@ -71,8 +71,8 @@ export default function Header() {
             </Link>
           </li>
           <li className={styles.navItem}>
-            <Link href='/protected'>
-              <a>Protected</a>
+            <Link href='/upload'>
+              <a>Upload</a>
             </Link>
           </li>
           <li className={styles.navItem}>
