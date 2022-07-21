@@ -1,0 +1,87 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "retrieve",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "num",
+						"type": "uint256"
+					}
+				],
+				"name": "store",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"details": "Handles access and retrieval of artwork from Web3 storage. Includes verification",
+			"kind": "dev",
+			"methods": {
+				"retrieve()": {
+					"details": "Return value ",
+					"returns": {
+						"_0": "value of 'number'"
+					}
+				},
+				"store(uint256)": {
+					"details": "Store value in variable",
+					"params": {
+						"num": "value to store"
+					}
+				}
+			},
+			"title": "RetrieveArtwork.sol",
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/RetrieveArtwork.sol": "RetrieveArtwork"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/RetrieveArtwork.sol": {
+			"keccak256": "0xd5f695aba03f47a46e020a3e2db59c42fa0fadee308a234c44031735c6337aa6",
+			"license": "UNLICENSED",
+			"urls": [
+				"bzz-raw://b3d8e4f50a3191eecc11091b957ecdcbbf5d1191b7171a099aa9b6e5e69daf97",
+				"dweb:/ipfs/QmSi1edY7gFnbKQdx7FGopeARHCgU4dB5u2xELrr4qymqS"
+			]
+		}
+	},
+	"version": 1
+}
