@@ -13,7 +13,7 @@ export default function AccessDenied() {
             signIn()
           }}
         >
-          You must be signed in to view this page.
+          Please make sure you are signed in with Metamask installed.
         </a>
       </Text>
     </>

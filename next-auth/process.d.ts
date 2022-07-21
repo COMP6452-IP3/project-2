@@ -13,5 +13,6 @@ declare namespace NodeJS {
     AUTH0_ID: string
     AUTH0_SECRET: string
     WEB3_TOKEN: string
+    INFURA_TOKEN: string
   }
 }
