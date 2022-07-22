@@ -11,41 +11,28 @@ import {
     Input,
 } from '@chakra-ui/react';
 import { makeStorageClient } from './api/web3';
-import Web3 from 'web3';
+import { useWeb3 } from '@3rdweb/hooks';
+import { ethers } from "ethers";
 import contactsAbi from '../contracts/Contacts.json';
 
 declare global {
     interface Window {
-        ethereum: any;
+        ethereum: any
     }
-    var ethereum: any;
 }
 
-interface ConnectInfo {
-    chainId: string;
-}
-
-export default function Upload() {
+const Upload = () => {
     const { data: session, status } = useSession();
     const [files, setFiles] = useState();
-    const [connected, setConnected] = useState(false);
+    const { connectWallet, address, error } = useWeb3();
 
-    // Fetch content from protected route
-    // useEffect(() => {
-    //   const fetchData = async () => {
-    //     const res = await fetch("/api/examples/upload")
-    //     const json = await res.json()
-    //     if (json.content) {
-    //       setContent(json.content)
-    //     }
-    //   }
-    //   fetchData()
-    // }, [session])
+    // const web3 = new Web3(
+    //     new Web3.providers.HttpProvider(
+    //         `https://ropsten.infura.io/v3/${process.env.INFURA_TOKEN}`
+    //     )
+    // );
 
-    // When rendering client side don't display anything until loading is complete
-    // if (typeof window !== "undefined" && loading) return null
-
-    // If no session exists, display access denied message
+    // If no session exists or metamask not installed, display access denied message
     if (!session || typeof window.ethereum == 'undefined') {
         return (
             <Layout>
@@ -54,48 +41,79 @@ export default function Upload() {
         );
     }
 
-    const contractAddress = '0xa495a02dc0278f8233299fcb42521cefde32fcbd';
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+
+    const contractAddress = '0x54d071740f29eaee58401b447740019c6230482e';
     const ABI = contactsAbi;
-    const web3 = new Web3(
-        new Web3.providers.HttpProvider(
-            `https://ropsten.infura.io/${process.env.INFURA_TOKEN}`
-        )
-    );
+    const contract = new ethers.Contract(contractAddress, ABI, signer);
 
-    if (session && connected) {
-        // @ts-ignore
-        const contract = new web3.eth.Contract(ABI, contractAddress);
-        contract.methods
-            .createContact(session.user?.name, 'testPhoneNumber')
-            .send({from: ethereum.selectedAddress} , (err: any, res: any) => {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log(res);
-                }
-            });
-    }
-
-    ethereum.on('disconnect', (error: any) => {
-        window.location.reload();
-    });
-
-    const handleConnect = async () => {
-        ethereum.request({ method: 'eth_requestAccounts' }).then((res: any) => {
-            if (!res.error) {
-                setConnected(true);
-            }
+    const createContact = async () => {
+        // if (session && account) {
+        //     // @ts-ignore
+        //     const contract = new web3.eth.Contract(ABI, contractAddress);
+        //     contract.methods
+        //         .createContact(session.user?.name, 'testPhoneNumber')
+        //         .send({ from: account }, (err: any, res: any) => {
+        //             if (err) {
+        //                 console.log(err);
+        //             } else {
+        //                 console.log(res);
+        //             }
+        //         });
+        // }
+        console.log("creating contact");
+        contract.createContact(session.user?.name, 'testPhoneNumber').then((tx: any) => {
+            console.log(`hash: ${tx.hash}`);
+        }).catch((err: any) => {
+            console.log(err);
         });
     };
 
+    
+    // Connect to metamask wallet
+    const handleConnect = async () => {
+        // const accounts = window.ethereum.request({ method: 'eth_requestAccounts' });
+        // setAccount(accounts[0]);
+        connectWallet('injected');
+    };
+    
+    // window.ethereum.on("chainChanged", () => window.location.reload());
+    
+    // window.ethereum.on("accountsChanged", (accounts: any) => {
+    //     if (accounts.length > 0) {
+    //         console.log(`Using account ${accounts[0]}`);
+    //     } else {
+    //         console.log('No accounts connected');
+    //     }
+    // });
+
+    // window.ethereum.on("message", (msg: any) => {console.log(msg)});
+
+    // window.ethereum.on("connect", (info: any) => {
+    //     console.log(`Connected to ${info}`);
+    // });
+
+    // window.ethereum.on("disconnect", (error: any) => {
+    //     console.log(`Disconnected: ${error}`);
+    // });
+    
     const handleFileChange = (e: any) => {
         setFiles(e.target.files);
     };
 
+
+    // const getData = async () => {
+    //     const accounts = await window.ethereum.request({ method: 'eth_accounts'});
+    //     console.log(`getdata: ${address}`);
+    // };
+
+    // getData();
+
     // If session exists, display content
     return (
         <Layout>
-            {!connected ? (
+            {!address ? (
                 <Button my={4} maxW='500px' w={'100%'} onClick={handleConnect}>
                     Connect to Metamask
                 </Button>
@@ -109,7 +127,7 @@ export default function Upload() {
                     boxShadow='lg'
                     textAlign={'center'}
                 >
-                    Connected to Metamask
+                    Connected to Metamask {address}
                 </Box>
             )}
             <Box
@@ -120,9 +138,6 @@ export default function Upload() {
                 boxShadow='lg'
             >
                 <Heading mb={2}>Upload file to copyright</Heading>
-                {/* <Box>
-        {content ?? "\u00a0"}\u00a0
-      </Box> */}
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
@@ -152,9 +167,10 @@ export default function Upload() {
                     </FormControl>
                 </form>
             </Box>
+            <Button onClick={createContact}>test contract</Button>
         </Layout>
     );
-}
+};
 
 const storeFiles = async (files: any) => {
     const client = makeStorageClient();
@@ -162,3 +178,21 @@ const storeFiles = async (files: any) => {
     console.log('stored files with cid:', cid);
     return cid;
 };
+
+// https://ropsten.etherscan.io/address/0x54d071740f29eaee58401b447740019c6230482e
+export default Upload;
+
+// Fetch content from protected route
+// useEffect(() => {
+//   const fetchData = async () => {
+//     const res = await fetch("/api/examples/upload")
+//     const json = await res.json()
+//     if (json.content) {
+//       setContent(json.content)
+//     }
+//   }
+//   fetchData()
+// }, [session])
+
+// When rendering client side don't display anything until loading is complete
+// if (typeof window !== "undefined" && loading) return null

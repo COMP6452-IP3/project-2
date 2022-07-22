@@ -54,6 +54,5 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
         res.status(200).json(status)
     }
 }
-// https://ropsten.etherscan.io/address/0xa495a02dc0278f8233299fcb42521cefde32fcbd
 
 export default handler;
