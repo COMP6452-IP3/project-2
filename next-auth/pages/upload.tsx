@@ -143,7 +143,6 @@ const Upload = () => {
                             </FormControl>
                         </form>
                     </Box>
-                    <Button onClick={createContact}>test contract</Button>
                     <Button onClick={logContacts}>log contacts</Button>
                 </>
             )}
