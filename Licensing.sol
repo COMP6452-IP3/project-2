@@ -22,7 +22,7 @@ contract Licensing {
     // A list of registered artworks in the system
     mapping (uint => Artwork) public artworks; // CID -> Artwork
     
-    function addArtwork (uint cid, string memory _title, uint _year) public {
+    function addArtwork (uint cid, string memory _title, uint _year) public restricted {
         artworks[cid].artist = msg.sender;
         artworks[cid].title = _title;
         artworks[cid].year = _year;
