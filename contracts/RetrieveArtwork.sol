@@ -34,6 +34,9 @@ contract Licensing {
     // A list of registered artworks in the system
     mapping (uint => Artwork) public artworks; // CID -> Artwork
 
+    event PermissionGranted(bool success, uint cid);
+    event PermissionNotGranted(uint cid);
+
     constructor() {
         artist = payable(msg.sender);   // ensures artist is a payable account
     }
@@ -59,17 +62,19 @@ contract Licensing {
     function getArtwork (uint cid) payable public returns (bool) { 
         uint len = artworks[cid].licenses.length;
         for (uint i = 0; i < len; i++) {
-            Permission memory _permission = artworks[cid].licenses[i];
+            Permission storage _permission = artworks[cid].licenses[i];
             if (msg.sender == _permission.licensee) {
                 // the user is someone with permission
                 // checks if the royalty is paid or not
                 if (_permission.paid == false) {
                     // royalty payments need to be done
-                    // the line below calls the fallback function
                     // todo: do we need to verify 
-                    (bool success, ) = address(this).call{value: _permission.royalty}("");
+                    require(msg.value == _permission.royalty, "Incorrect royalty amount.");
+                    // the line below calls the fallback function
+                    (bool success, ) = address(this).call{value: msg.value}("");
                     require(success, "Failed to send Ether");
                     _permission.paid = true;
+                    emit PermissionGranted(success, cid);
                 }
                 // If paid, all good to receive the artwork
                 // todo: make call to the off-chain system to return the artwork
@@ -77,6 +82,8 @@ contract Licensing {
             }
         }
         // If we're out of this loop without matching with the licensee then they cannot retrieve artwork
+        // Potential issue: if licensee sends in ETH royalty payment and function reaches here, then the licensee will lose that ETH
+        emit PermissionNotGranted(cid);
         return false;
     }
 
