@@ -2,15 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-// todo: (ask) could be better to have this smart contract
-// as part of the same smart contract as issuing permissions
-// since (A) will have access to the "owner" of the smart
-// contract (artist) to handle payments, (B) will be easier
-// to check if royalty has been paid (one time payment can
-// be tracked with bool). (C) easier to check if the licensee
-// which requests to use the artwork has indeed been given
-// permission
-
 /**
  * @title RetrieveArtwork.sol
  * @dev Handles access and retrieval of artwork from Web3 storage. Includes verification
@@ -108,7 +99,6 @@ contract Licensing {
                 // checks if the royalty is paid or not
                 if (_permission.paid == false) {
                     // royalty payments need to be done
-                    // todo: do we need to verify
                     require(
                         msg.value == _permission.royalty,
                         "Incorrect royalty amount."
@@ -120,7 +110,6 @@ contract Licensing {
                     emit PermissionGranted(success, cid);
                 }
                 // If paid, all good to receive the artwork
-                // todo: make call to the off-chain system to return the artwork
                 return true;
             }
         }
@@ -141,6 +130,8 @@ contract Licensing {
     }
 
     fallback() external payable {} // overwrite fallback function to accept ETH
+
+    receive() external payable {} // overwrite recieve function to accept ETH
 
     /// @notice must be called by the artist
     modifier restricted() {

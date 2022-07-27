@@ -3,9 +3,25 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Web3Storage } from 'web3.storage'
 
-type Data = {
-    data: any
+export const getAccessToken = () => {
+    return process.env.WEB3_TOKEN;
 }
+
+export const makeStorageClient = () => {
+    return new Web3Storage({ token: getAccessToken() })
+}
+
+const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+    const cid = 'bafybeibg2skeotp5ujtogaetp3akp6pvxjdegwcsqkxdfzfhtb4ja2gjby'
+    const client = makeStorageClient()
+    const status : any = await client.status(cid)
+    console.log(status)
+    if (status) {
+        res.status(200).json(status)
+    }
+}
+
+export default handler;
 
 // export default function handler(
 //   req: NextApiRequest,
@@ -36,23 +52,3 @@ type Data = {
 //         console.log(`${file.cid} ${file.name} ${file.size}`)
 //     }
 // }
-
-export const getAccessToken = () => {
-    return process.env.WEB3_TOKEN;
-}
-  
-export const makeStorageClient = () => {
-    return new Web3Storage({ token: getAccessToken() })
-}
-
-const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-    const cid = 'bafybeibg2skeotp5ujtogaetp3akp6pvxjdegwcsqkxdfzfhtb4ja2gjby'
-    const client = makeStorageClient()
-    const status : any = await client.status(cid)
-    console.log(status)
-    if (status) {
-        res.status(200).json(status)
-    }
-}
-
-export default handler;

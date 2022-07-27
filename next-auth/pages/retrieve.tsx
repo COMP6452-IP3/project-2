@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Layout from '../components/layout';
 import AccessDenied from '../components/access-denied';
@@ -16,7 +16,6 @@ import { makeStorageClient } from './api/web3';
 import { useWeb3 } from '@3rdweb/hooks';
 import { BigNumber, ethers } from 'ethers';
 import abi from '../contracts/Licensing.json';
-import { Web3Response } from 'web3.storage';
 
 declare global {
     interface Window {
@@ -46,17 +45,6 @@ const Retrieve = () => {
     const contractAddress: string = process.env.CONTRACT_ADDRESS as string; // Update this to the address of the contract
     const contract = new ethers.Contract(contractAddress, abi, signer);
 
-    const logArtworkCount = async () => {
-        contract
-            .count()
-            .then((count: any) => {
-                console.log(count.toNumber());
-            })
-            .catch((err: any) => {
-                console.log(err);
-            });
-    };
-
     // Connect to metamask wallet
     const handleConnect = async () => {
         connectWallet('injected');
@@ -73,9 +61,10 @@ const Retrieve = () => {
         if (!isValid) {
             return;
         }
+
         // get royalty cost from contract
         const royaltyCost: BigNumber = await contract.getRoyalty(cid);
-        console.log(`Royalty cost: ${royaltyCost.toNumber()}`);
+        console.log(`Royalty cost: ${royaltyCost}`);
 
         // set override value to royalty cost
         const overrides = {
@@ -181,7 +170,7 @@ const Retrieve = () => {
                             textAlign={'center'}
                         >
                             <Link
-                                // textColor={'blue.200'}
+                                textColor={'blue.200'}
                                 href={`https://ipfs.io/ipfs/${cid}`}
                                 isExternal
                             >
@@ -189,7 +178,6 @@ const Retrieve = () => {
                             </Link>
                         </Box>
                     )}
-                    {/* <Button onClick={logArtworkCount}>Log Artwork Count</Button> */}
                 </>
             )}
         </Layout>

@@ -26,7 +26,7 @@ const Authorize = () => {
     const { connectWallet, address, error } = useWeb3();
     const [cid, setCid] = useState<string>();
     const [userAddress, setUserAddress] = useState<string>();
-    const [royalty, setRoyalty] = useState<number>();
+    const [royalty, setRoyalty] = useState<number>(0);
     const [txHash, setTxHash] = useState<string>();
 
     // If no session exists or metamask not installed, display access denied message
@@ -44,37 +44,16 @@ const Authorize = () => {
     const contractAddress: string = process.env.CONTRACT_ADDRESS as string; // Update this to the address of the contract
     const contract = new ethers.Contract(contractAddress, abi, signer);
 
-    // const addArtwork = async (cid: string) => {
-    //     contract
-    //         .addArtwork(cid, title, year)
-    //         .then((tx: any) => {
-    //             console.log(`hash: ${tx.hash}`);
-    //             setUploadedCid(cid);
-    //         })
-    //         .catch((err: any) => {
-    //             console.log(`addArtwork ${err}`);
-    //         })
-    // };
-
-    const logArtworkCount = async () => {
-        contract
-            .count()
-            .then((count: any) => {
-                console.log(count.toNumber());
-            })
-            .catch((err: any) => {
-                console.log(err);
-            });
-    };
-
     // Connect to metamask wallet
     const handleConnect = async () => {
         connectWallet('injected');
     };
 
     const handleSubmit = async () => {
+        // convert royalty in eth to wei
+        const wei = ethers.utils.parseEther(royalty.toString());
         contract
-            .grantPermission(cid, userAddress, royalty)
+            .grantPermission(cid, userAddress, wei)
             .then((tx: any) => {
                 console.log(`hash: ${tx.hash}`);
                 setTxHash(tx.hash);
@@ -158,7 +137,7 @@ const Authorize = () => {
                                     }
                                     mb={2}
                                 />
-                                <FormLabel>Royalty Amount</FormLabel>
+                                <FormLabel>Royalty Amount (ETH) </FormLabel>
                                 <Input
                                     type={'number'}
                                     placeholder='Royalty Amount'
@@ -178,7 +157,6 @@ const Authorize = () => {
                             </FormControl>
                         </form>
                     </Box>
-                    {/* <Button onClick={logArtworkCount}>Log Artwork Count</Button> */}
                 </>
             )}
         </Layout>

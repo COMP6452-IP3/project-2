@@ -86,8 +86,8 @@ export default function Header() {
             </Link>
           </li>
           <li className={styles.navItem}>
-            <Link href='/me'>
-              <a>Me</a>
+            <Link href='/collect'>
+              <a>Collect</a>
             </Link>
           </li>
         </ul>
