@@ -182,7 +182,7 @@ const Upload = () => {
                             </FormControl>
                         </form>
                     </Box>
-                    <Button onClick={logArtworkCount}>Log Artwork Count</Button>
+                    {/* <Button onClick={logArtworkCount}>Log Artwork Count</Button> */}
                 </>
             )}
         </Layout>

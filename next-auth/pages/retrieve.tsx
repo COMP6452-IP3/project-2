@@ -16,6 +16,7 @@ import { makeStorageClient } from './api/web3';
 import { useWeb3 } from '@3rdweb/hooks';
 import { BigNumber, ethers } from 'ethers';
 import abi from '../contracts/Licensing.json';
+import { Web3Response } from 'web3.storage';
 
 declare global {
     interface Window {
@@ -26,8 +27,7 @@ declare global {
 const Retrieve = () => {
     const { data: session, status } = useSession();
     const { connectWallet, address, error } = useWeb3();
-    const [cid, setCid] = useState<string>();
-    const [validCid, setValidCid] = useState<boolean>(true);
+    const [cid, setCid] = useState<string>('');
     const [paid, setPaid] = useState<boolean>(false);
     const [txHash, setTxHash] = useState<string>();
 
@@ -64,39 +64,25 @@ const Retrieve = () => {
 
     const checkValidCID = async (cid: string) => {
         const client = makeStorageClient();
-        client
-            .status(cid)
-            .then((status: any) => {
-                setValidCid(true);
-            })
-            .catch((err: any) => {
-                setValidCid(false);
-            });
+        return client.status(cid);
     };
 
     const handleSubmit = async () => {
         // check if cid is valid
-        checkValidCID(cid as string);
-        if (!validCid) {
+        const isValid = await checkValidCID(cid);
+        if (!isValid) {
             return;
         }
         // get royalty cost from contract
         const royaltyCost: BigNumber = await contract.getRoyalty(cid);
-        console.log(royaltyCost.toNumber());
+        console.log(`Royalty cost: ${royaltyCost.toNumber()}`);
 
         // set override value to royalty cost
         const overrides = {
-            // value: royaltyCost, // ethers.utils.parseUnits(royaltyCost, 'wei'),
             value: ethers.utils.parseUnits(royaltyCost.toString(), 'wei'),
         };
-        contract
-            .payRoyalty(cid, overrides)
-            .then((success: boolean) => {
-                setPaid(success);
-            })
-            .catch((err: any) => {
-                console.log(err);
-            });
+        const status = await contract.payRoyalty(cid, overrides);
+        setPaid(status);
         // retrieve artwork from storage if paid
     };
 
@@ -170,20 +156,12 @@ const Retrieve = () => {
                                         placeholder='CID'
                                         onChange={(e) => setCid(e.target.value)}
                                     />
-                                    {/* <Button
-                                    type='submit'
-                                    w={'100%'}
-                                    colorScheme='teal'
-                                    variant='outline'
-                                >
-                                    Check if CID is valid
-                                </Button> */}
                                 </HStack>
 
                                 <Button
                                     type='submit'
                                     w={'100%'}
-                                    colorScheme={validCid ? 'teal' : 'red'}
+                                    colorScheme={'teal'}
                                     variant='outline'
                                 >
                                     Pay Royalties
@@ -191,7 +169,27 @@ const Retrieve = () => {
                             </FormControl>
                         </form>
                     </Box>
-                    <Button onClick={logArtworkCount}>Log Artwork Count</Button>
+
+                    {paid && (
+                        <Box
+                            my={4}
+                            p={4}
+                            maxWidth='500px'
+                            borderWidth={1}
+                            borderRadius={8}
+                            boxShadow='lg'
+                            textAlign={'center'}
+                        >
+                            <Link
+                                // textColor={'blue.200'}
+                                href={`https://ipfs.io/ipfs/${cid}`}
+                                isExternal
+                            >
+                                Download
+                            </Link>
+                        </Box>
+                    )}
+                    {/* <Button onClick={logArtworkCount}>Log Artwork Count</Button> */}
                 </>
             )}
         </Layout>
