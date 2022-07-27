@@ -6,7 +6,7 @@ export default function IndexPage() {
     <Layout>
       <Heading>COMP6452 Project 2</Heading>
       <Text>
-        Site run on Next.js with TypeScript and NextAuth.
+        Site run on React/Next.js with TypeScript and Chakra UI.
       </Text>
     </Layout>
   )
