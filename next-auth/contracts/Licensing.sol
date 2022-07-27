@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 /**
- * @title RetrieveArtwork.sol
+ * @title Licensing.sol
  * @dev Handles access and retrieval of artwork from Web3 storage. Includes verification
  */
 contract Licensing {
