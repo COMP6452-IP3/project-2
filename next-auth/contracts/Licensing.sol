@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 /**
- * @title RetrieveArtwork.sol
+ * @title Licensing.sol
  * @dev Handles access and retrieval of artwork from Web3 storage. Includes verification
  */
 contract Licensing {
@@ -114,7 +114,6 @@ contract Licensing {
             }
         }
         // If we're out of this loop without matching with the licensee then they cannot retrieve artwork
-        // Potential issue: if licensee sends in ETH royalty payment and function reaches here, then the licensee will lose that ETH
         emit PermissionNotGranted(cid);
         return false;
     }
