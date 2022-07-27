@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Layout from '../components/layout';
 import AccessDenied from '../components/access-denied';
@@ -9,11 +9,12 @@ import {
     FormLabel,
     Heading,
     Input,
+    Link,
 } from '@chakra-ui/react';
 import { makeStorageClient } from './api/web3';
 import { useWeb3 } from '@3rdweb/hooks';
 import { ethers } from 'ethers';
-import abi from '../contracts/Contacts.json';
+import abi from '../contracts/Licensing.json';
 
 declare global {
     interface Window {
@@ -25,6 +26,10 @@ const Upload = () => {
     const { data: session, status } = useSession();
     const { connectWallet, address, error } = useWeb3();
     const [files, setFiles] = useState();
+    const [title, setTitle] = useState<string>();
+    const [year, setYear] = useState<number>();
+    const [uploadedCid, setUploadedCid] = useState<string>();
+    const [txHash, setTxHash] = useState<string>();
 
     // If no session exists or metamask not installed, display access denied message
     if (!session || typeof window.ethereum == 'undefined') {
@@ -38,23 +43,24 @@ const Upload = () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
 
-    const contractAddress = '0x54d071740f29eaee58401b447740019c6230482e';
+    const contractAddress: string = process.env.CONTRACT_ADDRESS as string; // Update this to the address of the contract
     const contract = new ethers.Contract(contractAddress, abi, signer);
 
-    const createContact = async (cid: string) => {
+    const addArtwork = async (cid: string) => {
         contract
-            .createContact(session.user?.name, cid)
+            .addArtwork(cid, title, year)
             .then((tx: any) => {
                 console.log(`hash: ${tx.hash}`);
+                setTxHash(tx.hash);
+                setUploadedCid(cid);
             })
             .catch((err: any) => {
-                console.log(err);
-            });
+                console.log(`addArtwork ${err}`);
+            })
     };
 
-    const logContacts = async () => {
-        console.log('getting contacts');
-        await contract
+    const logArtworkCount = async () => {
+        contract
             .count()
             .then((count: any) => {
                 console.log(count.toNumber());
@@ -82,7 +88,8 @@ const Upload = () => {
 
     const handleSubmit = async () => {
         const cid = await storeFiles(files);
-        createContact(cid);
+        // createContact(cid);
+        addArtwork(cid);
     };
 
     return (
@@ -105,19 +112,37 @@ const Upload = () => {
                         Connected to Metamask {address}
                     </Box>
 
+                    {uploadedCid && (
+                        <Box
+                        my={4}
+                        p={4}
+                        maxWidth='500px'
+                        borderWidth={1}
+                        borderRadius={8}
+                        boxShadow='lg'
+                        textAlign={'center'}
+                    >
+                        Artwork ID: {uploadedCid}
+                        <br/>
+                        <Link textColor={'blue.200'} href={`https://ropsten.etherscan.io/tx/${txHash}`} isExternal>View on Etherscan</Link>
+                    </Box>
+                    
+                    )}
+
                     <Box
                         p={8}
                         maxWidth='500px'
                         borderWidth={1}
                         borderRadius={8}
                         boxShadow='lg'
+                        textAlign={'center'}
                     >
-                        <Heading mb={2}>Upload file to copyright</Heading>
+                        <Heading mb={4}>Upload file for copyright</Heading>
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 console.log('submitting files');
-                                if (files && address) {
+                                if (address) {
                                     handleSubmit().then(() => {
                                         console.log('finished submission');
                                     });
@@ -130,10 +155,24 @@ const Upload = () => {
                                     type='file'
                                     accept='image/*'
                                     onChange={handleFileChange}
+                                    mb={2}
+                                />
+                                <FormLabel>Title</FormLabel>
+                                <Input
+                                    type='text'
+                                    placeholder='Title'
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    mb={2}
+                                />
+                                <FormLabel>Year</FormLabel>
+                                <Input
+                                    type='number'
+                                    placeholder='Year'
+                                    onChange={(e) => setYear(parseInt(e.target.value))}
+                                    mb={4}
                                 />
                                 <Button
                                     type='submit'
-                                    mt={4}
                                     w={'100%'}
                                     colorScheme='teal'
                                     variant='outline'
@@ -143,8 +182,7 @@ const Upload = () => {
                             </FormControl>
                         </form>
                     </Box>
-                    <Button onClick={createContact}>test contract</Button>
-                    <Button onClick={logContacts}>log contacts</Button>
+                    {/* <Button onClick={logArtworkCount}>Log Artwork Count</Button> */}
                 </>
             )}
         </Layout>
@@ -214,3 +252,30 @@ export default Upload;
 //     const accounts = await window.ethereum.request({ method: 'eth_accounts'});
 //     console.log(`getdata: ${address}`);
 // };
+
+// --------------------------------------------------------------------------------
+
+// const createContact = async (cid: string) => {
+//     contract
+//         .createContact(session.user?.name, cid)
+//         .then((tx: any) => {
+//             console.log(`hash: ${tx.hash}`);
+//         })
+//         .catch((err: any) => {
+//             console.log(err);
+//         });
+// };
+
+// const logContacts = async () => {
+//     console.log('getting contacts');
+//     await contract
+//         .count()
+//         .then((count: any) => {
+//             console.log(count.toNumber());
+//         })
+//         .catch((err: any) => {
+//             console.log(err);
+//         });
+// };
+
+// const contractAddress = '0x54d071740f29eaee58401b447740019c6230482e';
