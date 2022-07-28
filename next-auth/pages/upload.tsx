@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import Layout from '../components/layout';
-import AccessDenied from '../components/access-denied';
 import {
     Box,
     Button,
@@ -23,7 +21,6 @@ declare global {
 }
 
 const Upload = () => {
-    const { data: session, status } = useSession();
     const { connectWallet, address, error } = useWeb3();
     const [files, setFiles] = useState();
     const [title, setTitle] = useState<string>();
@@ -31,22 +28,12 @@ const Upload = () => {
     const [uploadedCid, setUploadedCid] = useState<string>();
     const [txHash, setTxHash] = useState<string>();
 
-    // If no session exists or metamask not installed, display access denied message
-    if (!session || typeof window.ethereum == 'undefined') {
-        return (
-            <Layout>
-                <AccessDenied />
-            </Layout>
-        );
-    }
-
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-
-    const contractAddress: string = process.env.CONTRACT_ADDRESS as string; // Update this to the address of the contract
-    const contract = new ethers.Contract(contractAddress, abi, signer);
-
     const addArtwork = async (cid: string) => {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contractAddress: string = process.env.CONTRACT_ADDRESS as string; // Update this to the address of the contract
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+
         contract
             .addArtwork(cid, title, year)
             .then((tx: any) => {
@@ -56,17 +43,6 @@ const Upload = () => {
             })
             .catch((err: any) => {
                 console.log(`addArtwork ${err}`);
-            })
-    };
-
-    const logArtworkCount = async () => {
-        contract
-            .count()
-            .then((count: any) => {
-                console.log(count.toNumber());
-            })
-            .catch((err: any) => {
-                console.log(err);
             });
     };
 
@@ -114,19 +90,24 @@ const Upload = () => {
 
                     {uploadedCid && (
                         <Box
-                        my={4}
-                        p={4}
-                        maxWidth='500px'
-                        borderWidth={1}
-                        borderRadius={8}
-                        boxShadow='lg'
-                        textAlign={'center'}
-                    >
-                        Artwork ID: {uploadedCid}
-                        <br/>
-                        <Link textColor={'blue.200'} href={`https://ropsten.etherscan.io/tx/${txHash}`} isExternal>View on Etherscan</Link>
-                    </Box>
-                    
+                            my={4}
+                            p={4}
+                            maxWidth='500px'
+                            borderWidth={1}
+                            borderRadius={8}
+                            boxShadow='lg'
+                            textAlign={'center'}
+                        >
+                            Artwork ID: {uploadedCid}
+                            <br />
+                            <Link
+                                textColor={'blue.200'}
+                                href={`https://ropsten.etherscan.io/tx/${txHash}`}
+                                isExternal
+                            >
+                                View on Etherscan
+                            </Link>
+                        </Box>
                     )}
 
                     <Box
@@ -168,7 +149,9 @@ const Upload = () => {
                                 <Input
                                     type='number'
                                     placeholder='Year'
-                                    onChange={(e) => setYear(parseInt(e.target.value))}
+                                    onChange={(e) =>
+                                        setYear(parseInt(e.target.value))
+                                    }
                                     mb={4}
                                 />
                                 <Button

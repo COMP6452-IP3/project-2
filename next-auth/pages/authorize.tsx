@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import Layout from '../components/layout';
-import AccessDenied from '../components/access-denied';
 import {
     Box,
     Button,
@@ -15,34 +13,12 @@ import { useWeb3 } from '@3rdweb/hooks';
 import { ethers } from 'ethers';
 import abi from '../contracts/Licensing.json';
 
-declare global {
-    interface Window {
-        ethereum: any;
-    }
-}
-
 const Authorize = () => {
-    const { data: session, status } = useSession();
     const { connectWallet, address, error } = useWeb3();
     const [cid, setCid] = useState<string>();
     const [userAddress, setUserAddress] = useState<string>();
     const [royalty, setRoyalty] = useState<number>(0);
     const [txHash, setTxHash] = useState<string>();
-
-    // If no session exists or metamask not installed, display access denied message
-    if (!session || typeof window.ethereum == 'undefined') {
-        return (
-            <Layout>
-                <AccessDenied />
-            </Layout>
-        );
-    }
-
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-
-    const contractAddress: string = process.env.CONTRACT_ADDRESS as string; // Update this to the address of the contract
-    const contract = new ethers.Contract(contractAddress, abi, signer);
 
     // Connect to metamask wallet
     const handleConnect = async () => {
@@ -52,6 +28,12 @@ const Authorize = () => {
     const handleSubmit = async () => {
         // convert royalty in eth to wei
         const wei = ethers.utils.parseEther(royalty.toString());
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contractAddress: string = process.env.CONTRACT_ADDRESS as string; // Update this to the address of the contract
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+
         contract
             .grantPermission(cid, userAddress, wei)
             .then((tx: any) => {

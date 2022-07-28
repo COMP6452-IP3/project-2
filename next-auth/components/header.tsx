@@ -1,97 +1,62 @@
-import Link from 'next/link';
-import { signIn, signOut, useSession } from 'next-auth/react';
-import styles from './header.module.css';
-import { Box } from '@chakra-ui/react';
+import { ReactNode } from 'react';
+import NextLink from 'next/link';
+import {
+    Box,
+    Flex,
+    HStack,
+    Link,
+    useColorModeValue,
+} from '@chakra-ui/react';
 
-// The approach used in this component shows how to build a sign in and sign out
-// component that works on pages which support both client and server side
-// rendering, and avoids any flash incorrect content on initial page load.
-export default function Header() {
-  const { data: session, status } = useSession();
-  const loading = status === 'loading';
+interface NavLinkProps {
+    href: string;
+    children: ReactNode;
+}
 
-  return (
-    <Box w={'100%'} maxW={'1000px'} pt={2} px={8} >
-      {/* <style>{`.nojs-show { opacity: 1; top: 0; }`}</style> */}
-      <div className={styles.signedInStatus}>
-        <p
-          className={`nojs-show ${
-            !session && loading ? styles.loading : styles.loaded
-          }`}
+const NavLink = (props: NavLinkProps) => (
+    <NextLink href={props.href} passHref>
+        <Link
+            px={2}
+            py={1}
+            rounded={'md'}
+            _hover={{
+                textDecoration: 'none',
+                bg: useColorModeValue('gray.200', 'gray.700'),
+            }}
         >
-          {!session && (
-            <>
-              <span className={styles.notSignedInText}>
-                You are not signed in
-              </span>
-              <a
-                href={`/api/auth/signin`}
-                className={styles.buttonPrimary}
-                onClick={(e) => {
-                  e.preventDefault();
-                  signIn();
-                }}
-              >
-                Sign in
-              </a>
-            </>
-          )}
-          {session?.user && (
-            <>
-              {session.user.image && (
-                <span
-                  style={{ backgroundImage: `url('${session.user.image}')` }}
-                  className={styles.avatar}
-                />
-              )}
-              <span className={styles.signedInText}>
-                <small>Signed in as</small>
-                <br />
-                <strong>{session.user.email ?? session.user.name}</strong>
-              </span>
-              <a
-                href={`/api/auth/signout`}
-                className={styles.button}
-                onClick={(e) => {
-                  e.preventDefault();
-                  signOut();
-                }}
-              >
-                Sign out
-              </a>
-            </>
-          )}
-        </p>
-      </div>
-      <Box mt={2} >
-        <ul className={styles.navItems}>
-          <li className={styles.navItem}>
-            <Link href='/'>
-              <a>Home</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link href='/upload'>
-              <a>Upload</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link href='/authorize'>
-              <a>Authorize</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link href='/retrieve'>
-              <a>Retrieve</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link href='/collect'>
-              <a>Collect</a>
-            </Link>
-          </li>
-        </ul>
-      </Box>
-    </Box>
-  );
+            {props.children}
+        </Link>
+    </NextLink>
+);
+
+const Links = [
+    ['Home', '/'],
+    ['Upload', '/upload'],
+    ['Authorize', '/authorize'],
+    ['Retrieve', '/retrieve'],
+    ['Collect', '/collect'],
+];
+
+export default function Header() {
+    return (
+        <>
+            <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
+                <Flex
+                    h={16}
+                    alignItems={'center'}
+                    justifyContent={'space-between'}
+                >
+                    <HStack spacing={8} alignItems={'center'}>
+                        <HStack as={'nav'} spacing={4} display={'flex'}>
+                            {Links.map((link) => (
+                                <NavLink href={link[1]} key={link[0]}>
+                                    {link[0]}
+                                </NavLink>
+                            ))}
+                        </HStack>
+                    </HStack>
+                </Flex>
+            </Box>
+        </>
+    );
 }

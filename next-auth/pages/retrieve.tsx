@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import Layout from '../components/layout';
-import AccessDenied from '../components/access-denied';
 import {
     Box,
     Button,
@@ -17,33 +15,11 @@ import { useWeb3 } from '@3rdweb/hooks';
 import { BigNumber, ethers } from 'ethers';
 import abi from '../contracts/Licensing.json';
 
-declare global {
-    interface Window {
-        ethereum: any;
-    }
-}
-
 const Retrieve = () => {
-    const { data: session, status } = useSession();
     const { connectWallet, address, error } = useWeb3();
     const [cid, setCid] = useState<string>('');
     const [paid, setPaid] = useState<boolean>(false);
     const [txHash, setTxHash] = useState<string>();
-
-    // If no session exists or metamask not installed, display access denied message
-    if (!session || typeof window.ethereum == 'undefined') {
-        return (
-            <Layout>
-                <AccessDenied />
-            </Layout>
-        );
-    }
-
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-
-    const contractAddress: string = process.env.CONTRACT_ADDRESS as string; // Update this to the address of the contract
-    const contract = new ethers.Contract(contractAddress, abi, signer);
 
     // Connect to metamask wallet
     const handleConnect = async () => {
@@ -61,6 +37,11 @@ const Retrieve = () => {
         if (!isValid) {
             return;
         }
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contractAddress: string = process.env.CONTRACT_ADDRESS as string; // Update this to the address of the contract
+        const contract = new ethers.Contract(contractAddress, abi, signer);
 
         // get royalty cost from contract
         const royaltyCost: BigNumber = await contract.getRoyalty(cid);
