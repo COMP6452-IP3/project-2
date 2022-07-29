@@ -39,6 +39,10 @@ npm run build
 npm run start
 ```
 
+## Testing
+
+Run tests by copying `tests/Licensing_test.sol` into [Remix](https://remix.ethereum.org/) and running the tests.
+
 ## Tech Stack
 Frontend: React, Chakra-UI <br/>
 Backend: Node.js, Next.js, Ether.js <br/>
@@ -46,5 +50,6 @@ Database: Web3.storage <br/>
 Smart Contract: Solidity <br/>
 Wallet: Metamask <br/>
 Test Network: Ropsten <br/>
+
 
 
